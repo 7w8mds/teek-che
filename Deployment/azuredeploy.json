@@ -1,0 +1,342 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clientId": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "metadata": {
+        "description": "The client ID of the Azure AD app, e.g., 123e4567-e89b-12d3-a456-426655440000."
+      }
+    },
+    "clientSecret": {
+      "type": "securestring",
+      "minLength": 1,
+      "metadata": {
+        "description": "The client secret of the Azure AD app."
+      }
+    },
+    "botName": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the bot name with which the application will be created. Make a unique name other wise the deployment will fail. Is should be unique across the entire Microsft Teams"
+      },
+      "minLength": 1
+    },
+    "userId": {
+      "type": "string",
+      "minLength": 36,
+      "metadata": {
+        "description": "User Id who will create the calls on behalf of the tenant."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24,
+      "metadata": {
+        "description": "Storage account name."
+      }
+    },
+    "appServiceName": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 60,
+      "metadata": {
+        "description": "The web app where both the api and ui web applications will be hosted."
+      }
+    },
+    "tenantId": {
+      "type": "string",
+      "defaultValue": "[subscription().tenantId]",
+      "minLength": 1,
+      "maxLength": 36,
+      "metadata": {
+        "description": "The ID of the tenant to which the app will be deployed."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "allowedValues": [
+        "S1",
+        "S2",
+        "S3",
+        "P1v2",
+        "P2v2",
+        "P3v2",
+        "P1v3",
+        "P2v3",
+        "P3v3"
+      ],
+      "metadata": {
+        "description": "The SKU of App Service Plan."
+      }
+    },
+    "termsOfUseText": {
+      "type": "string",
+      "metadata": {
+        "description": "The text that will displayed in the app tour for the users on initial login."
+      }
+    },
+    "termsOfUseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "The terms of use url, make sure it will be url other wise it won't redirect to the url in terms of service page."
+      }
+    }
+  },
+  "functions": [],
+  "variables": {
+    "storageName": "[parameters('storageAccountName')]",
+    "location": "[resourceGroup().location]",
+    "applicationIdUri": "[concat('api://', parameters('appServiceName'), '.azurewebsites.net', '/', parameters('clientId'))]",
+    "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('appServiceName'))]",
+    "blobContainerName": "roomicons",
+    "appUrl": "[concat('https://', parameters('appServiceName'), '.azurewebsites.net')]",
+    "gitRepoUrl": "https://github.com/microsoft/csapps-msteams-watercooler.git",
+    "gitBranch": "main"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('appServicePlanPortalName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      }
+    },
+    {
+      "name": "[variables('storageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-01-01",
+      "tags": {
+        "displayName": "[variables('storageName')]"
+      },
+      "location": "[variables('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "allowBlobPublicAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2021-01-01",
+      "name": "[concat(parameters('storageAccountName'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2021-01-01",
+      "name": "[concat(parameters('storageAccountName'), '/default/', variables('blobContainerName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ],
+      "properties": {
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "Blob"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[parameters('appServiceName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[variables('location')]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('appServiceName'))]": "Resource"
+      },
+      "properties": {
+        "Application_Type": "web",
+        "Request_Source": "rest"
+      }
+    },
+    {
+      "apiVersion": "2018-07-12",
+      "name": "[parameters('botName')]",
+      "type": "Microsoft.BotService/botServices",
+      "location": "global",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "kind": "sdk",
+      "properties": {
+        "displayName": "[parameters('botName')]",
+        "description": "Water Cooler is an app that enables user to create, invite and join conversations",
+        "iconUrl": "https://raw.githubusercontent.com/microsoft/csapps-msteams-watercooler/main/Manifest/color.png",
+        "msaAppId": "[parameters('clientId')]",
+        "endpoint": "[concat(variables('appUrl'), '/api/messages/user')]",
+        "developerAppInsightKey": "[reference(resourceId('Microsoft.Insights/components', parameters('appServiceName')), '2015-05-01').InstrumentationKey]"
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('botName'), '/MsTeamsChannel')]",
+          "type": "Microsoft.BotService/botServices/channels",
+          "apiVersion": "2018-07-12",
+          "location": "global",
+          "sku": {
+            "name": "[parameters('sku')]"
+          },
+          "properties": {
+            "channelName": "MsTeamsChannel",
+            "properties": {
+              "enableCalling": true,
+              "callingWebhook": "[concat(variables('appUrl'), '/callback/calling')]",
+              "isEnabled": true
+            }
+          },
+          "dependsOn": [
+            "[concat('Microsoft.BotService/botServices/', parameters('botName'))]"
+          ]
+        }
+      ]
+    },
+    {
+      "apiVersion": "2018-11-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[parameters('appServiceName')]",
+      "location": "[variables('location')]",
+      "kind": "app",
+      "properties": {
+        "name": "[parameters('appServiceName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
+        "enabled": true,
+        "reserved": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureAd:ClientId",
+              "value": "[parameters('clientId')]"
+            },
+            {
+              "name": "AzureAd:ApplicationIdURI",
+              "value": "[variables('applicationIdUri')]"
+            },
+            {
+              "name": "AzureAd:ClientSecret",
+              "value": "[parameters('clientSecret')]"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "[parameters('tenantId')]"
+            },
+            {
+              "name": "Bot:AppId",
+              "value": "[parameters('clientId')]"
+            },
+            {
+              "name": "Bot:AppSecret",
+              "value": "[parameters('clientSecret')]"
+            },
+            {
+              "name": "Bot:BotBaseUrl",
+              "value": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net')]"
+            },
+            {
+              "name": "StorageAccountConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')),'2015-05-01-preview').key1, ';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "TermsOfUseUrl",
+              "value": "[parameters('termsOfUseUrl')]"
+            },
+            {
+              "name": "TermsOfUseText",
+              "value": "[parameters('termsOfUseText')]"
+            },
+            {
+              "name": "UserId",
+              "value": "[parameters('userId')]"
+            },
+            {
+              "name": "BlobContainerName",
+              "value": "[variables('blobContainerName')]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components/', parameters('appServiceName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "14.16.0"
+            },
+            {
+              "name": "SCM_COMMAND_IDLE_TIMEOUT",
+              "value": "600"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
+        "[resourceId('Microsoft.Insights/components', parameters('appServiceName'))]"
+      ],
+      "resources": [
+        {
+          "condition": "[contains(variables('gitRepoUrl'),'http')]",
+          "type": "sourcecontrols",
+          "apiVersion": "2018-02-01",
+          "name": "web",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+          ],
+          "properties": {
+            "repoUrl": "[variables('gitRepoUrl')]",
+            "branch": "[variables('gitBranch')]",
+            "isManualIntegration": true
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {}
+}
