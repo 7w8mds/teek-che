@@ -12,7 +12,7 @@ export const constants = {
   roomTitle: "Titel des Raumes",
   enterNewRoom: "Titel des Raumes eingeben",
   shortDescription: "Kurzbeschreibung",
-  enterShortDescription: "Kruzbeschreibung eingeben",
+  enterShortDescription: "Kurzbeschreibung eingeben",
   peoplePickerLabel: "Lade Kollegen ein",
   peoplePickerPlaceholder: "Gib einen Namen ein..",
   chooseRoomImage: "Wähle ein Logo für den Raum",
