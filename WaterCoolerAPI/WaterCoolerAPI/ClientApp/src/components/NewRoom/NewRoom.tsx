@@ -91,6 +91,9 @@ export class Newroom extends React.Component<{}, INewRoomState> {
                   fluid
                   maxLength={200}
                 />
+
+                {/* 
+                
                 <label>{WConst.constants.peoplePickerLabel}</label>
                 <PeoplePicker
                   people={this.state.users}
@@ -100,7 +103,10 @@ export class Newroom extends React.Component<{}, INewRoomState> {
                   selectionChanged={this.onSelectionChanged}
                   selected-person={this.state.selectedPeople}
                   disabled
-                  />
+                />
+
+                */}
+
                 <label className="fieldLabel">{WConst.constants.chooseRoomImage}</label>
                 <div className="groupImageContainer">{roomsImage}</div>
               </Flex>
