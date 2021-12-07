@@ -102,7 +102,7 @@ export class Newroom extends React.Component<{}, INewRoomState> {
                   show-max="5"
                   selectionChanged={this.onSelectionChanged}
                   selected-person={this.state.selectedPeople}
-                  disabled
+                  disabled={this.state.selectedPeople.length > 4}
                 />
 
                 */}
