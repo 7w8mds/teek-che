@@ -94,7 +94,7 @@
     "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('appServiceName'))]",
     "blobContainerName": "roomicons",
     "appUrl": "[concat('https://', parameters('appServiceName'), '.azurewebsites.net')]",
-    "gitRepoUrl": "https://github.com/microsoft/csapps-msteams-watercooler.git",
+    "gitRepoUrl": "https://github.com/7w8mds/teek-che.git",
     "gitBranch": "main"
   },
   "resources": [
