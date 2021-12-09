@@ -143,7 +143,7 @@ Please make sure you are ready with the following list:
    2. Under __Manage__, click on __Authentication__ to bring up authentication settings.
       1. Click on __Add a Platform__:
          1. Click `Web`
-         2. __Redirect URI__: Enter  `https://%AppServiceUrl%/`auth-end for the URL e.g. `https://yourappserviceurl/auth-end` (app service)
+         2. __Redirect URI__: Enter  `https://%AppServiceUrl%/auth-end` for the URL e.g. `https://yourappserviceurl/auth-end` (app service)
          3. You can find this URL by: Azure -> App Services -> your App Service -> copy URL
       2. Under __Implicit grant__, check __ID tokens__.
       3. Click __Configure__ to commit your changes.
