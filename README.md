@@ -108,7 +108,7 @@ Please make sure you are ready with the following list:
     3. Click __Register__ to complete the registration.
     4. When the app is registered, you'll be taken to the app's "Overview" page.
        1. Copy the __Application (client) ID__; we will need it later.
-       2. Verify that the "Supported account types" is set to __Multiple organizations.__
+       2. Verify that the "Supported account types" is set to __Single Tenannt.__
 
           ![Client ID](Wiki/Images/clientId.png)
     5. On the side rail in the Manage section, navigate to the "Certificates & secrets" section. 
