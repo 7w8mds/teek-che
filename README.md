@@ -130,7 +130,7 @@ Please make sure you are ready with the following list:
 2. __Deploy your Azure subscription__
     1. Click on the __Deploy to Azure__ button below.
 
-       [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fcsapps-msteams-watercooler%2Fmain%2FDeployment%2Fazuredeploy.json)
+       [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2F7w8mds%2Fteek-che%2Fmain%2FDeployment%2Fazuredeploy.json)
     2. When prompted, log in to your Azure subscription. 
     3. Azure will create a "Custom deployment" based on the Water Cooler ARM template and ask you to fill 
        in the template parameters.
