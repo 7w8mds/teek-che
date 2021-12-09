@@ -8,52 +8,6 @@ Water Cooler is a custom Teams app that enables corporate teams to create, invit
 
 The app provides an easy interface for anyone to find an existing conversation or start a new one. It's a foundation for building custom targeted communication capabilities, promoting interaction amongst coworkers who may otherwise not get a chance to socialize during breaks.
 
-![App Screens](Wiki/Images/appScreens.gif)
-
-## Key features
-
-* __Water Cooler Welcome Tour__: Welcome tour gives a brief introduction about the Water cooler app and helps the users on how to create the rooms or join existing rooms. 
-
-  ![WelcomeTour](Wiki/Images/WelcomeTour.gif)
-* __Water Cooler Home Page__: Browse existing rooms where team members are interacting in existing conversations with certain people or topics of interest. Active conversations on the Home Page will show a room name, short description, call duration, and room image. 
-
-  ![Homepage](Wiki/Images/homepage.png)
-* __Join room__: Active conversations will show a Join button to allow visitors to immediately enter an ongoing conversation.
-
-  ![Join room](Wiki/Images/joinRoom.png)
-* __Room creation__: Easily create rooms by specifying the room name, short description, up to 5 colleagues as an initial group and selecting from the provided set of room images. Room creation will create a Teams call/chat for all attendees to interact.
-
-  ![Create room](Wiki/Images/createRoom.png)
-* __Find room__: Use the find room feature to search keyword which will match the topic or short descriptions of ongoing conversations.
-
-  ![Find room](Wiki/Images/findConversation.png)
-* __Attendee invitation__: Just as with any Teams call, additional users can be invited after room creation.
-  ![Attendee invitation](Wiki/Images/attendeeInvitation.png)
-* __App badge__: Like other Teams apps, the Water Cooler icon on the left menu will show a badge with the number of active conversations visible from Teams while using any app.
-
-  ![App Badge](Wiki/Images/badge.png)
-
-## Architecture
-![Architecture](Wiki/Images/architecture.png)
-
-The __Water Cooler__ app has the following main components:
-* __App Service (API)__: The API app service will provide the API endpoints to get the Rooms Data, its participants, and to Add a New Room. 
-* __App Service (UI)__: The UI app service will display the Rooms and the participants in the room. 
-* __Azure Storage__: Azure Storage tables will store the Room Data and the participants information in the tables.
-* __Microsoft Graph API__: The app leverages Microsoft graph APIs to [List Participants](https://docs.microsoft.com/en-us/graph/api/call-list-participants?view=graph-rest-1.0&tabs=http), [Get User Profile.](https://docs.microsoft.com/en-us/graph/api/profile-get?view=graph-rest-beta&tabs=http)
-
-## App Service
-The app service implements two main concepts, Endpoints for displaying the calls and a scheduler job for updating the participant info.
-
-#### API Endpoint
-The end point will return all the active rooms by checking the azure storage tables. The azure storage tables will provide all active rooms. By utilizing the graph API, we will get the active participants in the call and return it data back to the UI. All these methods will be implemented using parallel async calls.
-
-#### Scheduler
-The scheduler will run for specified time and update database with the following things. It will loop through all the active calls and get the desired information from graph and based on the database records it will update or insert the records. E.g.: Currently there are 4 active users in the room. When the scheduler runs for the first time it will insert all 4 records. In next scheduler event we have a new participant in the call it will check for the change and as the new user is there it will insert the data. If any other user dropped off it will update the meeting end time for the user.
-
-#### UI
-The UI will fetch all the rooms and participants from the above-mentioned API and display the tiles information. The tile will have the Room name, description, participants list and a button to join the call. If the user is part of the call the join button will be displayed. Apart from that the first will be fixed and it will have the create new room button. Click on the button to open the dialog box with Room Name, Description and Participants list. After saving the Room a new call will be initiated. Bot will join the call and it will call other users who are invited initially. The UI application will continuously the poll the API to get the latest rooms information.
-
 ## Microsoft Graph API
 #### Delegated Permissions
 App service requires the following Delegated Permission:
@@ -387,3 +341,50 @@ This project welcomes contributions and suggestions. Most contributions require 
 When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+# Features
+![App Screens](Wiki/Images/appScreens.gif)
+
+## Key features
+
+* __Water Cooler Welcome Tour__: Welcome tour gives a brief introduction about the Water cooler app and helps the users on how to create the rooms or join existing rooms. 
+
+  ![WelcomeTour](Wiki/Images/WelcomeTour.gif)
+* __Water Cooler Home Page__: Browse existing rooms where team members are interacting in existing conversations with certain people or topics of interest. Active conversations on the Home Page will show a room name, short description, call duration, and room image. 
+
+  ![Homepage](Wiki/Images/homepage.png)
+* __Join room__: Active conversations will show a Join button to allow visitors to immediately enter an ongoing conversation.
+
+  ![Join room](Wiki/Images/joinRoom.png)
+* __Room creation__: Easily create rooms by specifying the room name, short description, up to 5 colleagues as an initial group and selecting from the provided set of room images. Room creation will create a Teams call/chat for all attendees to interact.
+
+  ![Create room](Wiki/Images/createRoom.png)
+* __Find room__: Use the find room feature to search keyword which will match the topic or short descriptions of ongoing conversations.
+
+  ![Find room](Wiki/Images/findConversation.png)
+* __Attendee invitation__: Just as with any Teams call, additional users can be invited after room creation.
+  ![Attendee invitation](Wiki/Images/attendeeInvitation.png)
+* __App badge__: Like other Teams apps, the Water Cooler icon on the left menu will show a badge with the number of active conversations visible from Teams while using any app.
+
+  ![App Badge](Wiki/Images/badge.png)
+
+## Architecture
+![Architecture](Wiki/Images/architecture.png)
+
+The __Water Cooler__ app has the following main components:
+* __App Service (API)__: The API app service will provide the API endpoints to get the Rooms Data, its participants, and to Add a New Room. 
+* __App Service (UI)__: The UI app service will display the Rooms and the participants in the room. 
+* __Azure Storage__: Azure Storage tables will store the Room Data and the participants information in the tables.
+* __Microsoft Graph API__: The app leverages Microsoft graph APIs to [List Participants](https://docs.microsoft.com/en-us/graph/api/call-list-participants?view=graph-rest-1.0&tabs=http), [Get User Profile.](https://docs.microsoft.com/en-us/graph/api/profile-get?view=graph-rest-beta&tabs=http)
+
+## App Service
+The app service implements two main concepts, Endpoints for displaying the calls and a scheduler job for updating the participant info.
+
+#### API Endpoint
+The end point will return all the active rooms by checking the azure storage tables. The azure storage tables will provide all active rooms. By utilizing the graph API, we will get the active participants in the call and return it data back to the UI. All these methods will be implemented using parallel async calls.
+
+#### Scheduler
+The scheduler will run for specified time and update database with the following things. It will loop through all the active calls and get the desired information from graph and based on the database records it will update or insert the records. E.g.: Currently there are 4 active users in the room. When the scheduler runs for the first time it will insert all 4 records. In next scheduler event we have a new participant in the call it will check for the change and as the new user is there it will insert the data. If any other user dropped off it will update the meeting end time for the user.
+
+#### UI
+The UI will fetch all the rooms and participants from the above-mentioned API and display the tiles information. The tile will have the Room name, description, participants list and a button to join the call. If the user is part of the call the join button will be displayed. Apart from that the first will be fixed and it will have the create new room button. Click on the button to open the dialog box with Room Name, Description and Participants list. After saving the Room a new call will be initiated. Bot will join the call and it will call other users who are invited initially. The UI application will continuously the poll the API to get the latest rooms information.
