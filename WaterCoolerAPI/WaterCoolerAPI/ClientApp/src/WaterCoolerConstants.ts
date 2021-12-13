@@ -23,7 +23,7 @@ export const constants = {
   welcomeCardContent: [{
     image: slideOne,
     title: "Trete in Kontakt mit deinen Kolleg:innen",
-    summary: "Der Wasserspender ist dazu da, um Gespräche über beliebte Themen zu führen", /* The Water Cooler is all about open conversations on any topic from the weather to sport or whatever sparks your interest." */ 
+    summary: "Die Teeküche ist dazu da, um Gespräche über beliebte Themen zu führen", /* The Water Cooler is all about open conversations on any topic from the weather to sport or whatever sparks your interest." */ 
   }, {
     image: slideTwo,
     title: "Erstelle deinen ersten Raum",
