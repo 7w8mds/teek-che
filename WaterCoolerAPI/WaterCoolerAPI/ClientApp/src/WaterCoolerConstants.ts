@@ -7,7 +7,7 @@ export const constants = {
   createRoom: "Raum erstellen",
   create: "Erstellen",
   join: "Beitreten",
-  charactersLeft: "Zeichen fehlen",
+  charactersLeft: "Zeichen verbleiben",
   roomLoadingMessage: "Geduld, dein Raum wird gestartet...",
   roomTitle: "Titel des Raumes",
   enterNewRoom: "Titel des Raumes eingeben",
